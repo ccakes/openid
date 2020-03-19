@@ -1,11 +1,11 @@
 use chrono::{DateTime, Duration, Utc};
-use serde::{de::Visitor, Deserialize, Deserializer};
+use serde::{de::Visitor, Serialize, Deserialize, Deserializer};
 use std::fmt;
 
 /// The bearer token type.
 ///
 /// See [RFC 6750](http://tools.ietf.org/html/rfc6750).
-#[derive(Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(Deserialize, Debug, Clone, PartialEq, Eq, Serialize)]
 pub struct Bearer {
     pub access_token: String,
     pub scope: Option<String>,
