@@ -1,5 +1,5 @@
 use chrono::{DateTime, Duration, Utc};
-use serde::{de::Visitor, Serialize, Deserialize, Deserializer};
+use serde::{de::Visitor, ser::Serializer, Serialize, Deserialize, Deserializer};
 use std::fmt;
 
 /// The bearer token type.
@@ -13,7 +13,8 @@ pub struct Bearer {
     #[serde(
         default,
         rename = "expires_in",
-        deserialize_with = "expire_in_to_instant"
+        deserialize_with = "expire_in_to_instant",
+        serialize_with = "serialize_expire_in"
     )]
     pub expires: Option<DateTime<Utc>>,
     pub id_token: Option<String>,
@@ -49,6 +50,13 @@ where
     }
 
     deserializer.deserialize_option(ExpireInVisitor)
+}
+
+fn serialize_expire_in<S: Serializer>(dt: &Option<DateTime<Utc>>, serializer: S) -> Result<S::Ok, S::Error> {
+    match dt {
+        Some(dt) => serializer.serialize_some(&dt.timestamp()),
+        None => serializer.serialize_none()
+    }
 }
 
 impl Bearer {
