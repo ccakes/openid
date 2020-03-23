@@ -196,15 +196,16 @@ impl Client<Discovered> {
         let alg = header.registered.algorithm;
         match key.algorithm {
             // HMAC
-            AlgorithmParameters::OctetKey { ref value, .. } => match alg {
+            AlgorithmParameters::OctetKey(ref oct) => match alg {
                 SignatureAlgorithm::HS256
                 | SignatureAlgorithm::HS384
                 | SignatureAlgorithm::HS512 => {
-                    *token = token.decode(&Secret::Bytes(value.clone()), alg)?;
+                    *token = token.decode(&Secret::Bytes(oct.value.clone()), alg)?;
                     Ok(())
                 }
                 _ => wrong_key!("HS256 | HS384 | HS512", alg),
             },
+            AlgorithmParameters::OctetKeyPair(_) => todo!(),
             AlgorithmParameters::RSA(ref params) => match alg {
                 SignatureAlgorithm::RS256
                 | SignatureAlgorithm::RS384
